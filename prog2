@@ -1,0 +1,56 @@
+import java.io.*;
+
+class Student implements Serializable {
+    String name;
+    int rollNumber;
+
+    // constructor, getters, setters, etc.
+
+    @Override
+    public String toString() {
+        return "Name: " + name + ", Roll Number: " + rollNumber;
+    }
+}
+
+public class StudentManager {
+
+    // Method to write student information to a file using DataOutputStream
+    public static void writeStudentToFile(Student student, String fileName) {
+        try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(fileName))) {
+            dataOutputStream.writeUTF(student.name);
+            dataOutputStream.writeInt(student.rollNumber);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to read student information from a file using DataInputStream
+    public static Student readStudentFromFile(String fileName) {
+        Student student = new Student();
+        try (DataInputStream dataInputStream = new DataInputStream(new FileInputStream(fileName))) {
+            student.name = dataInputStream.readUTF();
+            student.rollNumber = dataInputStream.readInt();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return student;
+    }
+
+    public static void main(String[] args) {
+        // Example usage
+        Student student = new Student();
+        student.setName("John Doe");
+        student.setRollNumber(101);
+
+        String fileName = "student_info.dat";
+
+        // Writing student information to file
+        writeStudentToFile(student, fileName);
+
+        // Reading student information from file
+        Student retrievedStudent = readStudentFromFile(fileName);
+
+        // Displaying retrieved student information
+        System.out.println("Retrieved Student Information: " + retrievedStudent);
+    }
+}
