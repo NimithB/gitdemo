@@ -1,0 +1,113 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_RECORDS 100
+// Define a structure for the record
+struct Record {
+int id;
+char name[50];
+// Add other fields as needed
+};
+// Define a structure for the index
+struct Index {
+int id;
+long offset; // Offset in the file where the record is stored
+};
+// Function prototypes
+void addRecord(FILE *file, struct Record *record, struct Index index[], int *indexSize);
+void searchRecord(FILE *file, struct Index index[], int indexSize, int id);
+void deleteRecord(FILE *file, struct Index index[], int *indexSize, int id);
+int main() {
+FILE *file;
+file = fopen("records.dat", "r+");
+if (file == NULL) {
+file = fopen("records.dat", "w+");
+if (file == NULL) {
+printf("Error creating file.\n");
+exit(1);
+}
+}
+// Initialize index array
+struct Index index[MAX_RECORDS];
+int indexSize = 0;
+int choice, id;
+struct Record newRecord;
+do {
+printf("\n1. Add Record\n2. Search Record\n3. Delete Record\n4. Exit\n");
+printf("Enter your choice: ");
+scanf("%d", &choice);
+switch (choice) {
+case 1:
+printf("Enter ID: ");
+scanf("%d", &newRecord.id);
+printf("Enter Name: ");
+scanf("%s", newRecord.name);
+addRecord(file, &newRecord, index, &indexSize);
+break;
+case 2:
+printf("Enter ID to search: ");
+scanf("%d", &id);
+searchRecord(file, index, indexSize, id);
+break;
+case 3:
+printf("Enter ID to delete: ");
+scanf("%d", &id);
+deleteRecord(file, index, &indexSize, id);
+break;
+case 4:
+printf("Exiting...\n");
+break;
+default:
+printf("Invalid choice. Please try again.\n");
+}
+} while (choice != 4);
+fclose(file);
+return 0;
+}
+void addRecord(FILE *file, struct Record *record, struct Index index[], int *indexSize) {
+// Write record to file
+fseek(file, 0, SEEK_END);
+long offset = ftell(file);
+fwrite(record, sizeof(struct Record), 1, file);
+// Update index
+index[*indexSize].id = record->id;
+index[*indexSize].offset = offset;
+(*indexSize)++;
+printf("Record added successfully.\n");
+}
+void searchRecord(FILE *file, struct Index index[], int indexSize, int id) {
+int i;
+for (i = 0; i < indexSize; i++) {
+if (index[i].id == id) {
+fseek(file, index[i].offset, SEEK_SET);
+struct Record record;
+fread(&record, sizeof(struct Record), 1, file);
+printf("Record found: ID: %d, Name: %s\n", record.id, record.name);
+return;
+}
+}
+printf("Record with ID %d not found.\n", id);
+}
+void deleteRecord(FILE *file, struct Index index[], int *indexSize, int id) {
+int i;
+for (i = 0; i < *indexSize; i++) {
+if (index[i].id == id) {
+// Shift elements in index array to remove the deleted record
+for (int j = i; j < *indexSize - 1; j++) {
+index[j] = index[j + 1];
+}
+(*indexSize)--;
+// Delete record from file (by updating with the last record)
+fseek(file, -sizeof(struct Record), SEEK_END);
+long lastRecordOffset = ftell(file);
+struct Record lastRecord;
+fread(&lastRecord, sizeof(struct Record), 1, file);
+fseek(file, index[i].offset, SEEK_SET);
+fwrite(&lastRecord, sizeof(struct Record), 1, file);
+ftruncate(fileno(file), lastRecordOffset); // Truncate file to remove the last record
+printf("Record with ID %d deleted successfully.\n", id);
+return;
+}
+}
+printf("Record with ID %d not found.\n", id);
+}
