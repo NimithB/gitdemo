@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_NAMES 100
+#define MAX_NAME_LENGTH 50
+
+void writeNamesToFile(char namesList[MAX_NAMES][MAX_NAME_LENGTH], int numNames, const char* filename) {
+    FILE* file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Error opening file %s\n", filename);
+        return;
+    }
+    for (int i = 0; i < numNames; i++) {
+        fprintf(file, "%s\n", namesList[i]);
+    }
+    fclose(file);
+}
+
+int main() {
+    char namesList1[MAX_NAMES][MAX_NAME_LENGTH];
+    char namesList2[MAX_NAMES][MAX_NAME_LENGTH];
+    int numNames1, numNames2;
+
+    printf("Enter the number of names in the first list: ");
+    scanf("%d", &numNames1);
+    printf("Enter the names in the first list:\n");
+    for (int i = 0; i < numNames1; i++) {
+        scanf("%s", namesList1[i]);
+    }
+
+    printf("\nEnter the number of names in the second list: ");
+    scanf("%d", &numNames2);
+    printf("Enter the names in the second list:\n");
+    for (int i = 0; i < numNames2; i++) {
+        scanf("%s", namesList2[i]);
+    }
+
+    writeNamesToFile(namesList1, numNames1, "file1.txt");
+    writeNamesToFile(namesList2, numNames2, "file2.txt");
+
+    FILE* file3 = fopen("file3.txt", "w");
+    if (file3 == NULL) {
+        printf("Error opening file file3.txt\n");
+        return 1;
+    }
+    for (int i = 0; i < numNames1; i++) {
+        for (int j = 0; j < numNames2; j++) {
+            if (strcmp(namesList1[i], namesList2[j]) == 0) {
+                fprintf(file3, "%s\n", namesList1[i]);
+                break;
+            }
+        }
+    }
+    fclose(file3);
+
+    printf("\nCommon names written to file3.txt successfully.\n");
+
+    return 0;
+}
+oydtodyoxypxoyxyoxlyxoyxyoxyoxoyxyoxyoxog
+#include <stdio.h>
+#include <string.h>
+#define MAX_NAMES 100
+#define K 3
+
+int main() {
+    char namesLists[K][MAX_NAMES][50];
+    int numNames[K];
+    int totalNames = 0;
+    for (int i = 0; i < K; i++) {
+        printf("Enter the number of names in list %d: ", i + 1);
+        scanf("%d", &numNames[i]);
+        printf("Enter the names in list %d:\n", i + 1);
+        for (int j = 0; j < numNames[i]; j++) {
+            scanf("%s", namesLists[i][j]);
+        }
+        totalNames += numNames[i];
+    }
+
+    char mergedNames[MAX_NAMES][50];
+    int mergedIndex = 0;
+    int currentIndex[K];
+    memset(currentIndex, 0, sizeof(currentIndex));
+    while (mergedIndex < totalNames) {
+        char smallestName[50];
+        int smallestList = -1;
+        for (int i = 0; i < K; i++) {
+            if (currentIndex[i] < numNames[i]) {
+                if (smallestList == -1 || strcmp(namesLists[i][currentIndex[i]], smallestName) < 0) {
+                    strcpy(smallestName, namesLists[i][currentIndex[i]]);
+                    smallestList = i;
+                }
+            }
+        }
+        strcpy(mergedNames[mergedIndex], smallestName);
+        mergedIndex++;
+        currentIndex[smallestList]++;
+    }
+
+    FILE* files[K];
+    for (int i = 0; i < K; i++) {
+        char filename[20];
+        sprintf(filename, "file%d.txt", i + 1);
+        files[i] = fopen(filename, "w");
+        for (int j = 0; j < numNames[i]; j++) {
+            fprintf(files[i], "%s\n", namesLists[i][j]);
+        }
+        fclose(files[i]);
+    }
+
+    FILE* allEntriesFile = fopen("file4.txt", "w");
+    for (int i = 0; i < totalNames; i++) {
+        fprintf(allEntriesFile, "%s\n", mergedNames[i]);
+    }
+    fclose(allEntriesFile);
+
+    printf("\nFiles created successfully.\n");
+
+    return 0;
+}
