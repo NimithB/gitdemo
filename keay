@@ -1,0 +1,69 @@
+1. Consequential Matching #include <stdio.h>
+#include <string.h>
+#define MAX_NAMES 100
+#define MAX_NAME_LENGTH 50
+int main() {
+char namesList1[MAX_NAMES][MAX_NAME_LENGTH];
+char namesList2[MAX_NAMES][MAX_NAME_LENGTH];
+int numNames1, numNames2;
+printf("Enter the number of names in the first list: "); scanf("%d", &numNames1);
+printf("Enter the names in the first list:\n");
+for (int i = 0; i < numNames1; i++) {
+        scanf("%s", namesList1[i]);
+    }
+printf("\nEnter the number of names in the second list: "); scanf("%d", &numNames2);
+printf("Enter the names in the second list:\n");
+for (int i = 0; i < numNames2; i++) {
+        scanf("%s", namesList2[i]);
+    }
+    printf("\nCommon names:\n");
+    for (int i = 0; i < numNames1; i++) {
+for (int j = 0; j < numNames2; j++) {
+if (strcmp(namesList1[i], namesList2[j]) == 0) {
+                printf("%s\n", namesList1[i]);
+break; }
+} }
+return 0; }
+
+2. K way Merge
+#include <stdio.h>
+#include <string.h>
+#define MAX_NAMES 100
+#define K 4
+int main() {
+     char namesLists[K][MAX_NAMES][50];
+     int numNames[K];
+     int totalNames = 0;
+     for (int i = 0; i < K; i++) {
+printf("Enter the number of names in list %d: ", i + 1); scanf("%d", &numNames[i]);
+printf("Enter the names in list %d:\n", i + 1);
+for (int j = 0; j < numNames[i]; j++) {
+               scanf("%s", namesLists[i][j]);
+          }
+          totalNames += numNames[i];
+     }
+     char mergedNames[MAX_NAMES][50];
+     int mergedIndex = 0;
+     int currentIndex[K];
+     memset(currentIndex, 0, sizeof(currentIndex));
+     while (mergedIndex < totalNames) {
+          char smallestName[50];
+          int smallestList = -1;
+          for (int i = 0; i < K; i++) {
+               if (currentIndex[i] < numNames[i]) {
+                    if (smallestList == -1 ||
+strcmp(namesLists[i][currentIndex[i]], smallestName) < 0) {
+                          strcpy(smallestName,
+namesLists[i][currentIndex[i]]);
+                          smallestList = i;
+} }
+          }
+          strcpy(mergedNames[mergedIndex], smallestName);
+          mergedIndex++;
+          currentIndex[smallestList]++;
+}
+printf("\nMerged list:\n");
+for (int i = 0; i < totalNames; i++) {
+          printf("%s\n", mergedNames[i]);
+     }
+return 0; }
